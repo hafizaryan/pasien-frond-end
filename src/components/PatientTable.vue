@@ -110,7 +110,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Remove the loading styles since we're using LoadingSpinner component */
-</style>

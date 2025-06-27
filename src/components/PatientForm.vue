@@ -47,7 +47,7 @@
         }}</small>
       </div>
       <button type="submit" class="btn btn-primary" :disabled="isLoading">
-        {{ isLoading ? "Menyimpan..." : "Daftar Pasien" }}
+        {{ isLoading ? "Menyimpan..." : "Daftar" }}
       </button>
     </form>
   </div>
@@ -81,17 +81,18 @@ export default {
     validateForm() {
       let isValid = true;
 
-      // Validasi NIK - format dasar saja (minimal 16 digit)
-      if (this.form.nik.length < 16) {
-        this.errors.nik = "NIK minimal 16 angka.";
+      // Validasi NIK - harus tepat 16 digit
+      if (this.form.nik.length !== 16) {
+        this.errors.nik = "NIK harus terdiri dari 16 angka.";
         isValid = false;
       } else {
         this.errors.nik = "";
       }
 
-      // Validasi Phone - format dasar saja (minimal 10 digit)
-      if (this.form.phone.length < 11) {
-        this.errors.phone = "Nomor telepon minimal 11 angka.";
+      // Validasi Phone - minimal 11 digit dan maksimal 13 digit
+      if (this.form.phone.length < 11 || this.form.phone.length > 13) {
+        this.errors.phone =
+          "Nomor telepon harus terdiri dari 11 hingga 13 angka.";
         isValid = false;
       } else {
         this.errors.phone = "";
@@ -114,7 +115,7 @@ export default {
           this.$emit("patient-added", response.data);
           this.$emit(
             "show-notification",
-            "Pasien berhasil didaftarkan!",
+            "Data Pasien berhasil didaftarkan!",
             "success"
           );
           this.resetForm();

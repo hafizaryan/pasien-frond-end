@@ -3,34 +3,103 @@
     <!-- Header -->
     <header>
       <div class="navbar">
-        <div class="logo">
-          <h1>RS Syafira</h1>
-        </div>
+        <a href="/" class="klik-logo"
+          ><div class="logo">
+            <img src="@/assets/logo.png" alt="RS Syafira Logo" />
+            <h1>RS Syafira</h1>
+          </div>
+        </a>
         <nav>
           <ul class="nav-links">
-            <li><a href="#home">Beranda</a></li>
-            <li><a href="#services">Layanan</a></li>
-            <li><a href="#patients">Data Pasien</a></li>
-            <li><a href="#register">Daftar</a></li>
+            <li v-if="!isAuthenticated">
+              <a href="#home" @click="showMainContent">Beranda</a>
+            </li>
+            <li v-if="!isAuthenticated">
+              <a href="#services" @click="showMainContent">Layanan</a>
+            </li>
+            <li v-if="!isAuthenticated">
+              <a href="#register" @click="showMainContent">Daftar Berobat</a>
+            </li>
+            <li v-if="!isAuthenticated">
+              <a href="#login" @click="showLogin">Login</a>
+            </li>
+            <li v-if="isAuthenticated">
+              <a href="#logout" @click="handleLogout">Logout</a>
+            </li>
           </ul>
         </nav>
       </div>
     </header>
 
+    <!-- Dashboard Section -->
+    <section v-if="showDashboard && isAuthenticated">
+      <Dashboard
+        :patients="patients"
+        @refresh-data="loadPatients"
+        @logout="handleLogout"
+        @navigate-to="handleNavigation"
+        @show-notification="showNotification"
+        @edit-patient="onEditPatient"
+        @patient-deleted="onPatientDeleted"
+      />
+    </section>
+
+    <!-- Login Section -->
+    <section id="login" v-if="showLoginSection && !isAuthenticated">
+      <LoginForm
+        @login-success="handleLoginSuccess"
+        @show-notification="showNotification"
+        @go-to-signup="
+          showSignupSection = true;
+          showLoginSection = false;
+        "
+      />
+    </section>
+
     <!-- Hero Section -->
-    <section class="hero" id="home">
+    <section
+      class="hero"
+      id="home"
+      v-if="
+        !showLoginSection &&
+        !showSignupSection &&
+        !showDashboard &&
+        !isAuthenticated
+      "
+    >
       <div class="container">
-        <h2>Selamat Datang di RS Syafira</h2>
+        <h2>Selamat Datang di Rumah Sakit Syafira</h2>
         <p>
-          Memberikan pelayanan kesehatan terbaik dengan teknologi modern dan
-          tenaga medis profesional
+          Rumah Sakit Syafira Pekanbaru awalnya adalah praktik mandiri dr.
+          Khairul Nasir, SpOG, yang bergabung dengan Apotek Bertuah pada 2002.
+          Pada 2006, dr. Khairul mendirikan Klinik Syafira yang sederhana dengan
+          fasilitas dan staf terbatas. Berkat pelayanan ramah dan keahliannya,
+          klinik ini berkembang hingga pada 2009 bersama istriya Lucky Kartika
+          Sari, SE ia berhasil mengembangkan klinik menjadi Rumah Sakit Bedah
+          dan Kebidanan 5 lantai dengan 114 tempat tidur, UGD 24 jam, dan lebih
+          dari 200 staf.
         </p>
-        <a href="#register" class="btn">Daftar Sekarang</a>
+        <p>
+          Pada 2017, RS Syafira semakin maju dengan gedung 11 lantai, 184 kamar
+          rawat inap, lebih dari 600 karyawan, serta fasilitas lengkap dan
+          pelayanan unggul. Rumah sakit ini kini menjadi salah satu rumah sakit
+          swasta terkemuka di Pekanbaru, dengan akreditasi PARIPURNA KARS.
+        </p>
+        <p>Melayani dengan senyum tulus</p>
+        <a href="#register" class="btn">Daftar Berobat Sekarang</a>
       </div>
     </section>
 
     <!-- Services Section -->
-    <section id="services">
+    <section
+      id="services"
+      v-if="
+        !showLoginSection &&
+        !showSignupSection &&
+        !showDashboard &&
+        !isAuthenticated
+      "
+    >
       <div class="container">
         <div class="section-title">
           <h2>Layanan Kami</h2>
@@ -48,36 +117,29 @@
           </div>
           <div class="service-card">
             <i class="fas fa-microscope"></i>
-            <h3>Laboratorium</h3>
-            <p>Pemeriksaan laboratorium lengkap</p>
+            <h3>Alat Diagnostik</h3>
+            <p>Alat diagnostik terlengkap</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Patient Registration Section -->
-    <section id="register">
+    <section
+      id="register"
+      v-if="
+        !showLoginSection &&
+        !showSignupSection &&
+        !showDashboard &&
+        !isAuthenticated
+      "
+    >
       <div class="container">
         <div class="section-title">
           <h2>Pendaftaran Pasien</h2>
         </div>
         <PatientForm
           @patient-added="onPatientAdded"
-          @show-notification="showNotification"
-        />
-      </div>
-    </section>
-
-    <!-- Patient List Section -->
-    <section id="patients">
-      <div class="container">
-        <div class="section-title">
-          <h2>Data Pasien</h2>
-        </div>
-        <PatientTable
-          :patients="patients"
-          @edit-patient="onEditPatient"
-          @patient-deleted="onPatientDeleted"
           @show-notification="showNotification"
         />
       </div>
@@ -99,7 +161,7 @@
     <footer>
       <div class="container">
         <div class="footer-content">
-          <div class="footer-logo">RS Syafira</div>
+          <div class="footer-logo">Rumah Sakit Syafira</div>
           <ul class="social-links">
             <li>
               <a href="#"><i class="fab fa-facebook"></i></a>
@@ -122,32 +184,51 @@
 
 <script>
 import PatientForm from "@/components/PatientForm.vue";
-import PatientTable from "@/components/PatientTable.vue";
 import EditPatientModal from "@/components/EditPatientModal.vue";
 import NotificationCenter from "@/components/NotificationCenter.vue";
-import { patientService } from "@/services/apiService";
+import LoginForm from "@/components/LoginForm.vue";
+import Dashboard from "@/components/Dashboard.vue";
+import { patientService, authService } from "@/services/apiService";
 
 export default {
   name: "App",
   components: {
     PatientForm,
-    PatientTable,
     EditPatientModal,
     NotificationCenter,
+    LoginForm,
+    Dashboard,
   },
   data() {
     return {
       patients: [],
       showEditModal: false,
       selectedPatient: {},
+      showLoginSection: false,
+      showSignupSection: false,
+      isAuthenticated: false,
+      currentUser: null,
+      showDashboard: false,
     };
   },
   mounted() {
-    this.loadPatients();
+    // Periksa status authentication terlebih dahulu
+    this.checkAuthenticationStatus();
+
+    // Hanya load patients jika user sudah authenticated
+    if (this.isAuthenticated) {
+      this.loadPatients();
+    }
+
     this.initSmoothScrolling();
   },
   methods: {
     async loadPatients() {
+      // Jangan load patients jika belum authenticated
+      if (!this.isAuthenticated) {
+        return;
+      }
+
       try {
         const response = await patientService.getPatients();
 
@@ -160,9 +241,14 @@ export default {
         }
       } catch (error) {
         console.error("Error:", error);
-        this.$refs.notifications.error(
-          "Terjadi kesalahan saat memuat data pasien"
-        );
+
+        // Jangan otomatis logout pada error
+        // Hanya tampilkan pesan error jika bukan masalah auth
+        if (error.response?.status !== 401) {
+          this.$refs.notifications.error(
+            "Terjadi kesalahan saat memuat data pasien"
+          );
+        }
       }
     },
 
@@ -206,6 +292,113 @@ export default {
           }
         });
       });
+    },
+
+    checkAuthenticationStatus() {
+      console.log("Memeriksa status authentication...");
+
+      this.isAuthenticated = authService.isAuthenticated();
+
+      if (this.isAuthenticated) {
+        this.currentUser = authService.getCurrentUser();
+        this.showDashboard = true;
+        this.showLoginSection = false;
+        this.showSignupSection = false;
+
+        console.log("User sudah login:", this.currentUser);
+      } else {
+        this.currentUser = null;
+        this.showDashboard = false;
+
+        console.log("User belum login");
+      }
+    },
+
+    showLogin() {
+      if (!this.isAuthenticated) {
+        this.showLoginSection = true;
+        this.showSignupSection = false;
+        this.showDashboard = false;
+      }
+    },
+
+    showMainContent() {
+      if (!this.isAuthenticated) {
+        this.showLoginSection = false;
+        this.showSignupSection = false;
+        this.showDashboard = false;
+      }
+    },
+
+    handleLoginSuccess(loginData) {
+      console.log("Login successful:", loginData);
+
+      // Sesuaikan dengan struktur response API
+      this.isAuthenticated = true;
+      this.currentUser = loginData.data.user; // data.user bukan langsung user
+
+      // Tampilkan dashboard
+      this.showDashboard = true;
+      this.showLoginSection = false;
+      this.showSignupSection = false;
+
+      // Load data patients setelah login
+      this.loadPatients();
+
+      // Tampilkan notifikasi sukses
+      this.showNotification(
+        `Selamat datang, ${loginData.data.user.name}!`,
+        "success"
+      );
+    },
+
+    async handleLogout() {
+      try {
+        // Panggil API logout
+        await authService.logout();
+
+        // Reset semua state authentication
+        this.isAuthenticated = false;
+        this.currentUser = null;
+        this.showDashboard = false;
+        this.showLoginSection = false;
+        this.showSignupSection = false;
+
+        // Hapus data patients
+        this.patients = [];
+
+        // Tampilkan notifikasi
+        this.showNotification("Berhasil logout", "success");
+
+        console.log("User berhasil logout");
+      } catch (error) {
+        console.error("Logout error:", error);
+
+        // Tetap lakukan logout local meskipun API error
+        this.isAuthenticated = false;
+        this.currentUser = null;
+        this.showDashboard = false;
+        this.showLoginSection = false;
+        this.showSignupSection = false;
+        this.patients = [];
+
+        this.showNotification("Logout berhasil (local)", "success");
+      }
+    },
+
+    handleNavigation(target) {
+      switch (target) {
+        case "patients":
+          this.showDashboard = false;
+          // Navigate to patients view
+          break;
+        case "add-patient":
+          this.showDashboard = false;
+          // Navigate to add patient form
+          break;
+        default:
+          console.log("Navigation to:", target);
+      }
     },
   },
 };
@@ -266,6 +459,10 @@ header {
   align-items: center;
 }
 
+.klik-logo {
+  text-decoration: none;
+}
+
 .logo img {
   height: 50px;
   margin-right: 10px;
@@ -314,8 +511,9 @@ header {
 }
 
 .hero p {
-  font-size: 1.2rem;
-  max-width: 800px;
+  font-size: 1rem;
+  max-width: 1200px;
+  text-align: justify;
   margin: 0 auto 2rem;
 }
 
