@@ -16,7 +16,7 @@ Pastikan Anda sudah menginstall:
 
 ```bash
 # Clone repository ini
-git clone https://github.com/username/rs-syafira-frontend.git
+git clone https://github.com/hafizaryan/pasien-frond-end.git
 
 # Masuk ke direktori project
 cd rs-syafira-frontend
@@ -39,35 +39,6 @@ Aplikasi akan berjalan di `http://localhost:8080`
 username: admin@gmail.com
 password: admin123
 
-## 📁 Struktur Project
-
-```
-rs-syafira-frontend/
-├── public/
-│   ├── favicon.ico
-│   └── index.html
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── Dashboard.vue
-│   │   ├── EditPatientModal.vue
-│   │   ├── LoadingSpinner.vue
-│   │   ├── LoginForm.vue
-│   │   ├── NotificationCenter.vue
-│   │   ├── PatientForm.vue
-│   │   ├── PatientTable.vue
-│   │   └── SignupForm.vue
-│   ├── services/
-│   │   └── apiService.js
-│   ├── App.vue
-│   └── main.js
-├── babel.config.js
-├── jsconfig.json
-├── package.json
-├── README.md
-└── vue.config.js
-```
-
 ## 🛠️ Available Scripts
 
 ### Development
@@ -85,14 +56,6 @@ npm run build
 ```
 
 Membangun aplikasi untuk production ke folder `dist/`.
-
-### Linting
-
-```bash
-npm run lint
-```
-
-Menjalankan ESLint untuk memeriksa dan memperbaiki kode.
 
 ## 🔧 Teknologi yang Digunakan
 
@@ -114,30 +77,3 @@ Menjalankan ESLint untuk memeriksa dan memperbaiki kode.
 ## 🌐 API Integration
 
 Project ini menggunakan `apiService.js` untuk mengelola komunikasi dengan backend API. Pastikan backend server sudah berjalan sebelum menggunakan aplikasi.
-
-## 📋 Environment Setup
-
-Untuk konfigurasi environment yang berbeda, Anda dapat membuat file:
-
-- `.env.local` - untuk development lokal
-- `.env.production` - untuk production
-
-## 🤝 Contributing
-
-1. Fork repository ini
-2. Buat branch fitur baru (`git checkout -b feature/AmazingFeature`)
-3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
-4. Push ke branch (`git push origin feature/AmazingFeature`)
-5. Buat Pull Request
-
-## 📞 Support
-
-Jika Anda mengalami masalah atau memiliki pertanyaan, silakan buat issue di repository ini.
-
-## 📄 License
-
-Project ini dilisensikan di bawah [MIT License](LICENSE).
-
----
-
-**Developed for RS Syafira** 🏥

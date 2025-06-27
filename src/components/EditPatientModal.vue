@@ -9,7 +9,7 @@
           <input
             type="text"
             id="editName"
-            v-model="form.name"
+            v-model="form.name"          
             required
             :disabled="isLoading"
           />
@@ -20,6 +20,7 @@
             type="text"
             id="editNik"
             v-model="form.nik"
+            maxlength="16"
             required
             :disabled="isLoading"
             @input="filterNumeric('nik')"
@@ -41,6 +42,8 @@
             type="tel"
             id="editPhone"
             v-model="form.phone"
+            minlength="11"
+            maxlength="13"
             required
             :disabled="isLoading"
             @input="filterNumeric('phone')"

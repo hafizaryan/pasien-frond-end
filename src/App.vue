@@ -2,15 +2,27 @@
   <div id="app">
     <!-- Header -->
     <header>
-      <div class="navbar">
+      <div class="navbar" data-aos="fade-down">
         <a href="/" class="klik-logo"
           ><div class="logo">
             <img src="@/assets/logo.png" alt="RS Syafira Logo" />
             <h1>RS Syafira</h1>
           </div>
         </a>
-        <nav>
-          <ul class="nav-links">
+
+        <div
+          class="hamburger"
+          :class="{ active: mobileMenuOpen }"
+          @click="toggleMobileMenu"
+          data-aos="fade-left"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <nav data-aos="fade-right">
+          <ul class="nav-links" :class="{ active: mobileMenuOpen }">
             <li v-if="!isAuthenticated">
               <a href="#home" @click="showMainContent">Beranda</a>
             </li>
@@ -24,7 +36,9 @@
               <a href="#login" @click="showLogin">Login</a>
             </li>
             <li v-if="isAuthenticated">
-              <a href="#logout" @click="handleLogout">Logout</a>
+              <a href="#logout" @click="handleLogout">
+                Logout <i class="fas fa-sign-out-alt"></i
+              ></a>
             </li>
           </ul>
         </nav>
@@ -32,7 +46,7 @@
     </header>
 
     <!-- Dashboard Section -->
-    <section v-if="showDashboard && isAuthenticated">
+    <section v-if="showDashboard && isAuthenticated" data-aos="fade-up">
       <Dashboard
         :patients="patients"
         @refresh-data="loadPatients"
@@ -45,7 +59,11 @@
     </section>
 
     <!-- Login Section -->
-    <section id="login" v-if="showLoginSection && !isAuthenticated">
+    <section
+      id="login"
+      v-if="showLoginSection && !isAuthenticated"
+      data-aos="fade-in"
+    >
       <LoginForm
         @login-success="handleLoginSuccess"
         @show-notification="showNotification"
@@ -60,6 +78,7 @@
     <section
       class="hero"
       id="home"
+      data-aos="fade-up"
       v-if="
         !showLoginSection &&
         !showSignupSection &&
@@ -86,7 +105,9 @@
           swasta terkemuka di Pekanbaru, dengan akreditasi PARIPURNA KARS.
         </p>
         <p>Melayani dengan senyum tulus</p>
-        <a href="#register" class="btn">Daftar Berobat Sekarang</a>
+        <a href="#register" class="btn" data-aos="zoom-in"
+          >Daftar Berobat Sekarang</a
+        >
       </div>
     </section>
 
@@ -99,23 +120,24 @@
         !showDashboard &&
         !isAuthenticated
       "
+      data-aos="fade-up"
     >
       <div class="container">
         <div class="section-title">
           <h2>Layanan Kami</h2>
         </div>
         <div class="services">
-          <div class="service-card">
+          <div class="service-card" data-aos="flip-left">
             <i class="fas fa-user-md"></i>
             <h3>Konsultasi Dokter</h3>
             <p>Konsultasi dengan dokter spesialis berpengalaman</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-aos="flip-left">
             <i class="fas fa-ambulance"></i>
             <h3>Layanan Darurat</h3>
             <p>Pelayanan gawat darurat 24 jam</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-aos="flip-left">
             <i class="fas fa-microscope"></i>
             <h3>Alat Diagnostik</h3>
             <p>Alat diagnostik terlengkap</p>
@@ -189,6 +211,7 @@ import NotificationCenter from "@/components/NotificationCenter.vue";
 import LoginForm from "@/components/LoginForm.vue";
 import Dashboard from "@/components/Dashboard.vue";
 import { patientService, authService } from "@/services/apiService";
+import Swal from "sweetalert2";
 
 export default {
   name: "App",
@@ -209,6 +232,7 @@ export default {
       isAuthenticated: false,
       currentUser: null,
       showDashboard: false,
+      mobileMenuOpen: false,
     };
   },
   mounted() {
@@ -221,6 +245,13 @@ export default {
     }
 
     this.initSmoothScrolling();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".navbar") && this.mobileMenuOpen) {
+        this.closeMobileMenu();
+      }
+    });
   },
   methods: {
     async loadPatients() {
@@ -279,7 +310,6 @@ export default {
     },
 
     initSmoothScrolling() {
-      // Add smooth scrolling for navigation links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener("click", function (e) {
           e.preventDefault();
@@ -319,6 +349,7 @@ export default {
         this.showLoginSection = true;
         this.showSignupSection = false;
         this.showDashboard = false;
+        this.closeMobileMenu();
       }
     },
 
@@ -327,7 +358,16 @@ export default {
         this.showLoginSection = false;
         this.showSignupSection = false;
         this.showDashboard = false;
+        this.closeMobileMenu();
       }
+    },
+
+    toggleMobileMenu() {
+      this.mobileMenuOpen = !this.mobileMenuOpen;
+    },
+
+    closeMobileMenu() {
+      this.mobileMenuOpen = false;
     },
 
     handleLoginSuccess(loginData) {
@@ -353,6 +393,32 @@ export default {
     },
 
     async handleLogout() {
+      const result = await Swal.fire({
+        title: "Konfirmasi Logout",
+        text: "Apakah Anda yakin ingin keluar dari sistem?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Ya, Logout",
+        cancelButtonText: "Batal",
+        reverseButtons: true,
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      // Show loading message
+      Swal.fire({
+        title: "Logging out...",
+        text: "Sedang keluar dari sistem",
+        icon: "info",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
       try {
         // Panggil API logout
         await authService.logout();
@@ -367,8 +433,20 @@ export default {
         // Hapus data patients
         this.patients = [];
 
-        // Tampilkan notifikasi
-        this.showNotification("Berhasil logout", "success");
+        // Close mobile menu
+        this.closeMobileMenu();
+
+        // Show success message after loading
+        setTimeout(async () => {
+          await Swal.fire({
+            title: "Berhasil!",
+            text: "Anda telah keluar dari sistem",
+            icon: "success",
+            confirmButtonColor: "#28a745",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        }, 1500);
 
         console.log("User berhasil logout");
       } catch (error) {
@@ -382,7 +460,20 @@ export default {
         this.showSignupSection = false;
         this.patients = [];
 
-        this.showNotification("Logout berhasil (local)", "success");
+        // Close mobile menu
+        this.closeMobileMenu();
+
+        // Show success message for local logout
+        setTimeout(async () => {
+          await Swal.fire({
+            title: "Berhasil!",
+            text: "Anda telah keluar dari sistem",
+            icon: "success",
+            confirmButtonColor: "#28a745",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        }, 1500);
       }
     },
 
@@ -403,400 +494,3 @@ export default {
   },
 };
 </script>
-
-<style>
-/* Import Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-
-:root {
-  --primary-color: #862bc6;
-  --primary-light: #a45ad4;
-  --primary-dark: #6a1b9a;
-  --secondary-color: #f5f5f5;
-  --text-color: #333;
-  --white: #ffffff;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: "Poppins", sans-serif;
-  color: var(--text-color);
-  line-height: 1.6;
-  background-color: var(--secondary-color);
-}
-
-#app {
-  font-family: "Poppins", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: var(--text-color);
-}
-
-header {
-  background-color: var(--white);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  width: 100%;
-  z-index: 1000;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 5%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.klik-logo {
-  text-decoration: none;
-}
-
-.logo img {
-  height: 50px;
-  margin-right: 10px;
-}
-
-.logo h1 {
-  color: var(--primary-color);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.nav-links {
-  display: flex;
-  list-style: none;
-}
-
-.nav-links li {
-  margin-left: 2rem;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: var(--text-color);
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.nav-links a:hover {
-  color: var(--primary-color);
-}
-
-.hero {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-light)
-  );
-  color: var(--white);
-  padding: 8rem 5% 5rem;
-  text-align: center;
-}
-
-.hero h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.hero p {
-  font-size: 1rem;
-  max-width: 1200px;
-  text-align: justify;
-  margin: 0 auto 2rem;
-}
-
-.btn {
-  display: inline-block;
-  background-color: var(--white);
-  color: var(--primary-color);
-  padding: 0.8rem 2rem;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s;
-  border: none;
-  cursor: pointer;
-}
-
-.btn:hover {
-  background-color: var(--primary-dark);
-  color: var(--white);
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary {
-  background-color: var(--primary-dark);
-  color: var(--white);
-}
-
-.btn-primary:hover {
-  background-color: var(--white);
-  color: var(--primary-color);
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 5%;
-}
-
-section {
-  padding: 5rem 0;
-}
-
-.section-title {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.section-title h2 {
-  font-size: 2rem;
-  color: var(--primary-color);
-  position: relative;
-  display: inline-block;
-  padding-bottom: 0.5rem;
-}
-
-.section-title h2::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background-color: var(--primary-color);
-}
-
-.services {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.service-card {
-  background-color: var(--white);
-  border-radius: 10px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-}
-
-.service-card:hover {
-  transform: translateY(-10px);
-}
-
-.service-card i {
-  font-size: 3rem;
-  color: var(--primary-color);
-  margin-bottom: 1.5rem;
-}
-
-.service-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.patient-form {
-  background-color: var(--white);
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-family: inherit;
-}
-
-.form-group textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-footer {
-  background-color: var(--primary-color);
-  color: var(--white);
-  padding: 3rem 0;
-  text-align: center;
-}
-
-.footer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.footer-logo {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.social-links {
-  display: flex;
-  list-style: none;
-  margin-bottom: 1.5rem;
-}
-
-.social-links li {
-  margin: 0 1rem;
-}
-
-.social-links a {
-  color: var(--white);
-  font-size: 1.5rem;
-  transition: color 0.3s;
-}
-
-.social-links a:hover {
-  color: var(--secondary-color);
-}
-
-.copyright {
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-/* Modal */
-.modal {
-  display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: var(--white);
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-}
-
-.close-modal {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-color);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    padding: 1rem;
-  }
-
-  .logo {
-    margin-bottom: 1rem;
-  }
-
-  .nav-links {
-    margin-top: 1rem;
-  }
-
-  .nav-links li {
-    margin: 0 0.5rem;
-  }
-
-  .hero {
-    padding-top: 10rem;
-  }
-
-  .hero h2 {
-    font-size: 2rem;
-  }
-}
-
-/* Patient List */
-.patient-list {
-  background-color: var(--white);
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: var(--primary-light);
-  color: var(--white);
-}
-
-tr:hover {
-  background-color: #f5f5f5;
-}
-
-.action-buttons button {
-  padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.edit-btn {
-  background-color: #ffc107;
-  color: #000;
-}
-
-.delete-btn {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.action-buttons button:hover {
-  opacity: 0.8;
-}
-</style>

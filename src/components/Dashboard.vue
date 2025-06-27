@@ -71,6 +71,7 @@
 <script>
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { patientService } from "@/services/apiService";
+import Swal from "sweetalert2";
 
 export default {
   name: "DashboardMain",
@@ -137,7 +138,19 @@ export default {
     },
 
     async deletePatient(patientId) {
-      if (!confirm("Apakah Anda yakin ingin menghapus data pasien ini?")) {
+      const result = await Swal.fire({
+        title: "Hapus Data Pasien",
+        text: "Apakah Anda yakin ingin menghapus data pasien ini?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Ya, Hapus!",
+        cancelButtonText: "Batal",
+        reverseButtons: true,
+      });
+
+      if (!result.isConfirmed) {
         return;
       }
 
@@ -148,20 +161,32 @@ export default {
 
         if (response.success) {
           this.$emit("patient-deleted", patientId);
+
+          // Show success alert
+          await Swal.fire({
+            title: "Berhasil!",
+            text: "Data pasien berhasil dihapus.",
+            icon: "success",
+            confirmButtonColor: "#28a745",
+            timer: 2000,
+            showConfirmButton: false,
+          });
         } else {
-          this.$emit(
-            "show-notification",
-            "Gagal menghapus data pasien: " + response.message,
-            "error"
-          );
+          await Swal.fire({
+            title: "Gagal!",
+            text: "Gagal menghapus data pasien: " + response.message,
+            icon: "error",
+            confirmButtonColor: "#dc3545",
+          });
         }
       } catch (error) {
         console.error("Error:", error);
-        this.$emit(
-          "show-notification",
-          "Terjadi kesalahan saat menghapus data pasien",
-          "error"
-        );
+        await Swal.fire({
+          title: "Error!",
+          text: "Terjadi kesalahan saat menghapus data pasien",
+          icon: "error",
+          confirmButtonColor: "#dc3545",
+        });
       } finally {
         this.isDeleting = false;
       }

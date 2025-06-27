@@ -132,7 +132,7 @@ export default {
 
         if (response.success) {
           // Emit event untuk parent component dengan struktur response yang benar
-          this.$emit("login-success", response);         
+          this.$emit("login-success", response);
 
           // Reset form
           this.resetForm();
@@ -231,11 +231,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-light)
-  );
+  background: linear-gradient(135deg);
 }
 
 .login-form {

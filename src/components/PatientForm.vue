@@ -17,6 +17,7 @@
           type="text"
           id="nik"
           v-model="form.nik"
+          maxlength="16"
           required
           :disabled="isLoading"
           @input="filterNumeric('nik')"
@@ -27,7 +28,7 @@
         <label for="address">Alamat</label>
         <textarea
           id="address"
-          v-model="form.address"
+          v-model="form.address"          
           required
           :disabled="isLoading"
         ></textarea>
@@ -38,6 +39,8 @@
           type="tel"
           id="phone"
           v-model="form.phone"
+          minlength="11"
+          maxlength="13"
           required
           :disabled="isLoading"
           @input="filterNumeric('phone')"
