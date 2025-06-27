@@ -37,7 +37,7 @@ npm run serve
 Aplikasi akan berjalan di `http://localhost:8080`
 
 username: admin@gmail.com
-password: admin12345
+password: admin123
 
 ## 📁 Struktur Project
 
