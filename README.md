@@ -12,6 +12,10 @@ Pastikan Anda sudah menginstall:
 - [Git](https://git-scm.com/)
 - Package manager: npm (sudah termasuk dengan Node.js)
 
+## 🌐 API Integration
+
+Project ini menggunakan `apiService.js` untuk mengelola komunikasi dengan backend API. Pastikan backend server sudah berjalan sebelum menggunakan aplikasi.
+
 ### 1. Clone Repository
 
 ```bash
@@ -73,7 +77,3 @@ Membangun aplikasi untuk production ke folder `dist/`.
 - **Sistem Login/Register** - Autentikasi pengguna
 - **Notifikasi** - Sistem notifikasi real-time
 - **Responsive Design** - Tampilan responsif untuk semua perangkat
-
-## 🌐 API Integration
-
-Project ini menggunakan `apiService.js` untuk mengelola komunikasi dengan backend API. Pastikan backend server sudah berjalan sebelum menggunakan aplikasi.
